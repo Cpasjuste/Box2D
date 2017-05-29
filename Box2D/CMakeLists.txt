@@ -1,5 +1,17 @@
 cmake_minimum_required(VERSION 2.6)
 
+option(BOX2D_BUILD_VITA "Build Box2D for PS VITA" ON)
+if(BOX2D_BUILD_VITA)
+    if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+        if (DEFINED ENV{VITASDK})
+            set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+        else ()
+            message(FATAL_ERROR "Please define VITASDK to point to your SDK path!")
+        endif ()
+    endif ()
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+endif()
+
 project(Box2D)
 
 if(UNIX)
@@ -24,11 +36,15 @@ if(BOX2D_BUILD_EXAMPLES)
   # HelloWorld console example.
   add_subdirectory(HelloWorld)
 
+if(NOT BOX2D_BUILD_VITA)
   # Testbed and dependencies.
   find_package(OpenGL REQUIRED)
   add_subdirectory(glew)
   add_subdirectory(glfw)
   add_subdirectory(Testbed)
+else()
+    add_subdirectory(HelloWorldVita)
+endif()
 endif(BOX2D_BUILD_EXAMPLES)
 
 if(BOX2D_INSTALL_DOC)
